@@ -8,8 +8,8 @@ Base = declarative_base()
 class Sales(Base):
     __tablename__ = 'orders'
 
-    order_id = Column(NVARCHAR(40), primary_key=True, autoincrement=False)
-    order_details_id = Column(NVARCHAR(40))
+    order_id = Column(NVARCHAR(40))
+    order_details_id = Column(NVARCHAR(40),primary_key=True, autoincrement=False)
     order_timestamp = Column(DateTime)
     name = Column(NVARCHAR(100))
     category = Column(NVARCHAR(100))
