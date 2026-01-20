@@ -31,8 +31,8 @@ El presente proyecto consiste en la automatización en el proceso de carga de ó
 ## 🚀 Instalación
 
 ```bash
-git clone https://github.com/juanacvm/PizzaPlaceSales.git
-cd PizzaPlaceSales
+git clone https://github.com/juanacvm/PizzaOrders.git
+cd PizzaOrders
 
 # Creación del entorno virtual de pruebas
 python -m venv venv
@@ -110,4 +110,4 @@ PizzaOrders/
 
 ---
 
-**Última actualización**: 18 de Enero 2026
+**Última actualización**: 19 de Enero 2026
