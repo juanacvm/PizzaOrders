@@ -2,3 +2,4 @@ pandas
 chardet
 sqlalchemy
 pyodbc
+python-dotenv
