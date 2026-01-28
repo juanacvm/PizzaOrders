@@ -1,113 +1,148 @@
-# Proyecto de automatización de carga de pedidos en una pizzería.
+# Pipeline ETL para la carga de pedidos de pizza con Pandas, SQLAlchemy y Docker
 
-El presente proyecto consiste en la automatización en el proceso de carga de órdenes registradas de una pizzeria a una base de datos.
+## Descripción
 
-## 📋 Contenido
+Proyecto que implementa un pipeline de extracción, transformación y carga (ETL) utilizando Python. Consume datos de múltiples archivos CSV relacionados con órdenes e información de pizzas, transforma los datos a través de pandas y los guarda en una tabla SQL creada mediante SQLAlchemy. Además de ello, aplica control de errores durante el proceso de la implementación.
 
-- [Características](#características)
-- [Requisitos](#requisitos)
-- [Instalación](#instalación)
-- [Configuración](#configuración)
-- [Uso](#uso)
-- [Estructura](#estructura)
+## Características
 
-## ✨ Características
+- **Separación de responsabilidades:** Creación de métodos en distintos archivos `.py` para separar la lógica de configuración, conexión a base de datos, transformación de datos y ejecución del pipeline, logrando un mejor mantenimiento del código.
 
-- Detección automática del formato de encoding de los archivos fuentes.
-- Extracción de datos desde múltiple fuentes de archivos csv
-- Consolidación de datos en una sola sábana de información.
-- Limpieza y normalización de datos para un mejor entendimiento.
-- Inclusión de proceso de logging para la determinar en qué punto se encuentra el proceso de carga.
-- Conexión segura hacia la base de datos SQL.
-- Generación del modelo de datos personalizado mediante ORM de SQL Alchemy.
-- Control de errores ante cualquier eventualidad.
+- **Extracción dinámica:** Implementación de lectura inteligente de múltiples archivos CSV desde la carpeta de datos (órdenes, detalles de órdenes, pizzas y tipos de pizzas) para evitar rutas hardcodeadas.
 
-## 📦 Requisitos
+- **Seguridad:** Gestión de credenciales mediante variables de entorno `.env` para separar información sensible con el código fuente.
 
-- Python 3.8+
-- SQL Server 2016+
-- ODBC Driver for SQL Server
+- **Logging:** Sistema de logs con niveles de severidad (INFO, ERROR, DEBUG) para gestión completa de trazabilidad del pipeline.
 
-## 🚀 Instalación
+- **Integración a Docker:** Creación de contenedores aislados para garantizar la ejecución del pipeline desde cualquier entorno sin dependencias del sistema.
 
-```bash
-git clone https://github.com/juanacvm/PizzaOrders.git
-cd PizzaOrders
+## Arquitectura del Pipeline
 
-# Creación del entorno virtual de pruebas
-python -m venv venv
-venv\Scripts\activate  # Windows
+El pipeline sigue el procedimiento ETL estándar:
 
-# Instalación de dependencias (librerías)
-pip install -r requirements.txt
+```
+Entrada (Múltiples CSV) → Extracción → Transformación → Carga (SQL Server)
 ```
 
-## ⚙️ Configuración
+### Flujo de datos:
 
-Modificar el archivo `.env.example` a `.env`
+1. **Extracción**: Lee datos de cuatro archivos CSV:
+   - `orders.csv` - Información general del pedido
+   - `order_details.csv` - Detalle del pedido
+   - `pizzas.csv` - Catálogo de pizzas disponibles
+   - `pizza_types.csv` - Categorías de las pizzas
 
-Añadir tus parámetros a  `.env` con los parámetros de SQL Server:
+2. **Transformación**: 
+   - Fusión de múltiples fuentes de datos
+   - Normalización de columnas
+   - Conversión de tipos de datos
+   - Limpieza de valores nulos
+   - Enriquecimiento de datos con información relacional
+   - Relleno de valores faltantes según tipo de dato
 
-```python
-db_server = "Nombre de tu servidor"
-db_name = "Nombre de base de datos"
-db_user = "Usuario de acceso a la base de datos"
-db_password = "Contraseña del usuario"
-db_driver = "Nombre del driver, puede ser ODBC Driver 17 for SQL Server"
-```
+3. **Carga**: Carga de datos consolidados en tabla SQL Server
 
-Verificar que los archivos CSV existan en la carpeta `data/`:
-- `orders.csv`
-- `order_details.csv`
-- `pizzas.csv`
-- `pizza_types.csv`
+## Tecnologías Utilizadas
 
-## 🔧 Uso
+- **Python 3.11**
+- **Pandas**: Para la carga y transformación de datos
+- **SQLAlchemy**: Para la gestión de base de datos (ORM)
+- **python-dotenv**: Para la configuración de variables de entorno
+- **Docker**: Para la creación de los contenedores del proyecto
+- **SQL Server 2022**: Para la gestión de base de datos relacionales
 
-```bash
-cd src
-python main.py
-```
-
-## 📁 Estructura
+## Estructura del Proyecto
 
 ```
 PizzaOrders/
-├── README.md
-├── requirements.txt
-├── data/                    # Carpeta que aloja los archivos CSV
-│   ├── orders.csv
-│   ├── order_details.csv
-│   ├── pizzas.csv
-│   └── pizza_types.csv
-├── src/                     # Carpeta de código fuente
-│   ├── config.py           # Configuración de variables .env
-│   ├── database.py         # Conexión a BD
-│   ├── models.py           # Diseño de modelos ORM
-│   ├── etl_logic.py        # Lógica ETL
-│   └── main.py             # Punto de ejecución de pipeline
-└── notebooks/
-    └── script.ipynb        # Notebook de pruebas del procesamiento de datos.
+├── data/
+│   ├── order_details.csv               # Detalle por pedido
+│   ├── orders.csv                      # Información de pedidos
+│   ├── pizza_types.csv                 # Tipos y categorías de pizzas
+│   └── pizzas.csv                      # Catálogo de pizzas
+├── notebooks/
+│   └── script.ipynb                    # Notebook de pruebas
+├── src/
+│   ├── main.py                         # Script principal del pipeline
+│   ├── config.py                       # Configuración de variables de entorno
+│   ├── database.py                     # Conexión y gestión de base de datos
+│   ├── models.py                       # Creación de modelos ORM de tablas
+│   └── etl_logic.py                    # Lógica de extracción y transformación
+├── Dockerfile                          # Configuración de contenedor
+├── docker-compose.yaml                 # Orquestación de servicios
+├── requirements.txt                    # Dependencias de Python
+├── .gitignore                          # Archivos ignorados por Git
+└── README.md                           # Este archivo
 ```
 
-## 📊 Tabla de Salida
+## Prerequisitos
 
-**Tabla: orders (SQL Server)**
+- Python 3.11 o superior
+- SQL Server 2019 o superior instalado
+- Git para clonar el repositorio
+- Docker y Docker Compose (opcional, para ejecución en contenedores)
+- Acceso a línea de comandos (PowerShell, CMD o Terminal)
+- pip (Gestor de paquetes de Python)
 
-- **order_id**: Número de identificador del pedido
-- **order_details_id (PK)**: Número del detalle de pedido
-- **order_timestamp**: Fecha y hora del pedido
-- **name**: Nombre de pizza
-- **category**: Categoría de la pizza
-- **size**: Tamaño de la pizza
-- **quantity**: Cantidad de pizzas solicitadas
-- **price**: Precio por unidad
-- **total_line**: Precio total del detalle
+## Configuración e Instalación
 
-## 👤 Autor
+### Opción 1: Ejecución a nivel local
 
-[Juan](https://github.com/juanacvm)
+#### Requisitos previos:
+- Python 3.11+
+- SQL Server en ejecución
+- pip (gestor de paquetes)
 
----
+#### Instalación:
 
-**Última actualización**: 19 de Enero 2026
+1. **Instalar dependencias:**
+```bash
+pip install -r requirements.txt
+```
+
+2. **Configurar variables de entorno (reemplazar `.env.example` por `.env`):**
+```
+DB_SERVER="Nombre del servidor (SELECT @@SERVERNAME)"
+DB_NAME="Nombre de la base de datos"
+DB_USER="Usuario de base de datos"
+DB_PASSWORD="Contraseña del usuario de base de datos"
+DB_DRIVER="Driver de DB, puede ser: ODBC Driver 17 for SQL Server"
+```
+
+3. **Ejecutar el pipeline:**
+```bash
+python src/main.py
+```
+
+### Opción 2: Ejecución con Docker
+
+#### Requisitos:
+- Docker y Docker Compose instalados
+
+#### Instalación:
+
+1. **Configurar variables de entorno (reemplazar `.env.example` por `.env`):**
+```
+DB_SERVER=mssql_pizza_server,1433
+DB_NAME="Nombre de la base de datos"
+DB_USER=sa
+DB_PASSWORD="Contraseña del usuario de base de datos"
+DB_DRIVER=ODBC Driver 17 for SQL Server
+```
+
+2. **Construir e iniciar los contenedores:**
+```bash
+docker-compose up --build
+```
+
+3. **Detener los servicios:**
+```bash
+docker-compose down
+```
+
+#### Configuración de Docker:
+- SQL Server se ejecuta en puerto `1434` (mapeo desde 1433 interno)
+- Python se inicia automáticamente tras la disponibilidad de SQL Server
+- Los datos se persisten en volumen `mssql_data`
+
+> **Nota:** El proyecto requiere las librerías especificadas en `requirements.txt`. Todas se instalan automáticamente al ejecutar `pip install -r requirements.txt` en la opción local, o se incluyen en la imagen Docker para la opción de contenedores.
