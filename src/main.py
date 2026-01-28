@@ -1,7 +1,7 @@
 import logging
 import time
 import sys
-from database import engine_master,create_database,sql_query
+from database import engine, engine_master, create_database, sql_query
 from models import Base
 from etl_logic import *
 
@@ -18,12 +18,12 @@ log = logging.getLogger(__name__)
 def run_pipeline():
     
     log.info('Iniciando pipeline de datos...')
-    time.sleep(40)
+    time.sleep(70)
 
     try:
 
         log.info('Creando la base de datos en caso no exista...')
-        create_database(engine_master, sql_query)
+        create_database(engine, sql_query)
 
         log.info('Eliminando tablas existentes...')
         #Elimina tablas existentes

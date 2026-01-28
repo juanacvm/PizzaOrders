@@ -6,6 +6,7 @@ import urllib
 param = (
         f"DRIVER={{{db_driver}}};"
         f"SERVER={server};"
+        #f"DATABASE={db_name};"
         f"UID={user};"
         f"PWD={password};"
         "TrustServerCertificate=yes;"
@@ -17,7 +18,7 @@ connection_string = urllib.parse.quote_plus(param)
 url = f"mssql+pyodbc:///?odbc_connect={connection_string}"
 
 #Ejecuta la conexión a la base de datos
-engine = create_engine(url,fast_executemany=True,isolation_level="AUTOCOMMIT")
+engine = create_engine(url,fast_executemany=True, isolation_level="AUTOCOMMIT")
 
 sql_query = f"""
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = '{db_name}')
@@ -33,9 +34,11 @@ def create_database(engine, sql_query):
     except Exception as e:
         print(f"Error al crear la base de datos: {e}")
 
+
 param_master = param + f"DATABASE={db_name};" 
 connection_string_master = urllib.parse.quote_plus(param_master)
 url_master = f"mssql+pyodbc:///?odbc_connect={connection_string_master}"
 
 # Este es el engine que usarás para tus tablas
 engine_master = create_engine(url_master, fast_executemany=True)
+
