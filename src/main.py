@@ -1,5 +1,7 @@
 import logging
-from database import engine
+import time
+import sys
+from database import engine_master,create_database,sql_query
 from models import Base
 from etl_logic import *
 
@@ -15,15 +17,22 @@ log = logging.getLogger(__name__)
 
 def run_pipeline():
     
-    log.info('Eliminando tablas existentes...')
-    #Elimina tablas existentes
-    Base.metadata.drop_all(engine)
-
-    log.info('Creando tablas en la base de datos...')
-    #Crea tablas
-    Base.metadata.create_all(engine)
+    log.info('Iniciando pipeline de datos...')
+    time.sleep(40)
 
     try:
+
+        log.info('Creando la base de datos en caso no exista...')
+        create_database(engine_master, sql_query)
+
+        log.info('Eliminando tablas existentes...')
+        #Elimina tablas existentes
+        Base.metadata.drop_all(engine_master)
+
+        log.info('Creando tablas en la base de datos...')
+        #Crea tablas
+        Base.metadata.create_all(engine_master)
+
 
         log.info('Extrayendo los datos relacionados a los pedidos de pizza...')
         #Extrae datos de las ordenes
@@ -56,18 +65,21 @@ def run_pipeline():
 
         log.info('Cargando los datos a la tabla de pedidos...')
         #Carga los datos correspondientes a la tabla sql
-        pizza_orders_data.to_sql(name='orders', con=engine, if_exists='append', index=False)
+        pizza_orders_data.to_sql(name='orders', con=engine_master, if_exists='append', index=False)
 
         log.info('Se ha culminado con la carga del pipeline de pedidos de pizza...')
 
     except FileNotFoundError as e:
-        log.warning(f"No se ha podido cargar los documentos de datos: {e}")
+        log.error(f"No se ha podido cargar los documentos de datos: {e}")
+        sys.exit(1)
 
     except ValueError as e:
-        log.warning(f"Hubo error con el procesamiento de datos {e}")
+        log.error(f"Hubo error con el procesamiento de datos {e}")
+        sys.exit(1)
 
     except Exception as e:
-        log.warning(f"El proceso de pipeline se detuvo debido a un error inesperado {e}")
+        log.error(f"El proceso de pipeline se detuvo debido a un error inesperado {e}")
+        sys.exit(1)
 
 if __name__ == '__main__':
     run_pipeline()
