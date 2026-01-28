@@ -1,0 +1,27 @@
+services:
+  mssql_server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_pizza_server
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD='{DB_PASSWORD}'
+      - MSSQL_AGENT_ENABLED=false
+    volumes:
+      - mssql_data:/var/opt/mssql
+    ports:
+      - "1434:1433"
+
+  script:
+    build: .
+    container_name: python-container
+    depends_on:
+      - mssql_server
+    environment:
+      - SQLSERVERNAME=mssql_pizza_server
+    volumes:
+      - ./data:/app/data
+      - ./src:/app/src
+
+
+volumes:
+  mssql_data:
