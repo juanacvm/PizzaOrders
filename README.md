@@ -97,8 +97,8 @@ PizzaOrders/
 
 1. **Clona el repositorio**
 ```bash
-git clone https://github.com/juanacvm/PizzaOrders.git
-cd PizzaOrders-main
+git clone https://github.com/juanacvm/orders-etl-pipeline.git
+cd orders-etl-pipeline-main
 ```
 
 2. **Instalar dependencias:**
@@ -130,8 +130,8 @@ python src/main.py
 
 1. **Clona el repositorio**
 ```bash
-git clone https://github.com/juanacvm/PizzaOrders.git
-cd PizzaOrders-main
+git clone https://github.com/juanacvm/orders-etl-pipeline.git
+cd orders-etl-pipeline-main
 ```
 
 2. **Configurar variables de entorno (reemplazar `.env.example` por `.env`):**
